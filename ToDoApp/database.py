@@ -14,6 +14,5 @@ engine = create_engine(SQL_ALCHEMY_DATABASE, connect_args={"check_same_thread": 
 
 sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = (
-    declarative_base()
-)  # This declarative base will maintain the ORM in the database, THis base is where all the ORM models (Tables) will be inherited from
+Base = declarative_base()
+  # This declarative base will maintain the ORM in the database, THis base is where all the ORM models (Tables) will be inherited from
