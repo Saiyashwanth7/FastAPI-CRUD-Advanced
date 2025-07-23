@@ -8,7 +8,7 @@ from sqlalchemy.orm import (
 
 from sqlalchemy.ext.declarative import declarative_base
 
-SQL_ALCHEMY_DATABASE = "sqlite:///./todos.db"  # This will create the todos database in this folder using sqlite
+SQL_ALCHEMY_DATABASE = "sqlite:///./todosapp.db"  # This will create the todos database in this folder using sqlite
 
 engine = create_engine(SQL_ALCHEMY_DATABASE, connect_args={"check_same_thread": False})
 
