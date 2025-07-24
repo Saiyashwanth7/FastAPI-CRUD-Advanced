@@ -25,7 +25,12 @@ class Token(BaseModel):
     
 router = APIRouter()
 
-SECRET_KEY="d5bbc198a5de8cb2e71245d6ee97a9d993f199689a5c0922a1803170274f5be0"
+SECRET_KEY="your-secret-key" 
+"""
+to generate your own secert key run this command in terminal 
+python -c "import secerts;print(secrets.token_hex(32))"  
+
+"""
 ALGORITHM="HS256"
 bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')
 
