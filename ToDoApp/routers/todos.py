@@ -8,7 +8,10 @@ from starlette import status
 from pydantic import BaseModel, Field
 from routers import auth
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/app',
+    tags=['todos']
+)
 
 class TodoRequest(BaseModel):
     title: Annotated[str, Field(min_length=7)]

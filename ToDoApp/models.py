@@ -16,6 +16,7 @@ class User(Base):
     role = Column(String)
 
 
+
 class Todo(Base):
 
     # In DBMS, table contains columns and rows, The rows are also called as records
