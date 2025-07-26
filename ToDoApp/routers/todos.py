@@ -6,7 +6,7 @@ from database import engine, sessionLocal
 from sqlalchemy.orm import session
 from starlette import status
 from pydantic import BaseModel, Field
-from routers import auth
+from .auth import decode_token
 
 router = APIRouter(
     prefix='/app',
@@ -37,6 +37,8 @@ from the fastapi"""
 
 db_dependency = Annotated[session, Depends(get_db)]
 
+user_dependency = Annotated[dict,Depends(decode_token)]
+
 
 # we can either use the above variable or directly the Annotated[....] in the below endpoint
 @router.get("/")
@@ -53,12 +55,16 @@ async def read_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
 
 
 @router.post("/todo/create", status_code=status.HTTP_201_CREATED)
-async def create_todo(newtodo: TodoRequest, db: db_dependency):
+async def create_todo(newtodo: TodoRequest, db: db_dependency,user:user_dependency):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail= "Authenication failed")
+    
     todo_record = Todo(
         title=newtodo.title,
         description=newtodo.description,
         priority=newtodo.priority,
         completed=newtodo.completed,
+        owner=user.get('id')
     )
     """
         instead of above code we can also use below one:
