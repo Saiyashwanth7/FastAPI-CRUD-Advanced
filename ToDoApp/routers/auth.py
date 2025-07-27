@@ -20,7 +20,6 @@ class UserRequest(BaseModel):
     password: Annotated[str, Field(min_length=8)]
     role: str
 
-<<<<<<< HEAD
 
 class Token(BaseModel):
     access_token: str
@@ -39,16 +38,6 @@ SECRET_KEY = "d5bbc198a5de8cb2e71245d6ee97a9d993f199689a5c0922a1803170274f5be0"
 ALGORITHM = "HS256"
 
 
-=======
-SECRET_KEY="your-secret-key" 
-"""
-to generate your own secert key run this command in terminal 
-python -c "import secerts;print(secrets.token_hex(32))"  
-
-"""
-ALGORITHM="HS256"
-bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')
->>>>>>> f98fb63f478d54339786507c6ff58c4ec04b754b
 
 def get_db():
     db = sessionLocal()
@@ -82,7 +71,7 @@ def authenticate_user(username: str, password: str, db):
 
 
 def create_token(username: str, user_id: int, expires_delta: timedelta):
-    encode = {"sup": username, "id": user_id}
+    encode = {"sub": username, "id": user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({"exp": expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -90,7 +79,7 @@ def create_token(username: str, user_id: int, expires_delta: timedelta):
 
 async def decode_token(token: Annotated[str, Depends(oauth_bearer)]):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]) #here algorithms must be in list unlike the encoding token part
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
         if not username or not user_id:
@@ -115,7 +104,6 @@ async def create_user(db: db_dependency, userrequest: UserRequest):
     db.add(new_user)
     db.commit()
 
-<<<<<<< HEAD
     return UserRequest(
         email=new_user.email,
         username=new_user.username,
@@ -139,12 +127,3 @@ async def login_for_access_token(
     token = create_token(user.username, user.id, timedelta(minutes=30))
     return Token(access_token=token, token_type="bearer")
 
-=======
-@router.post('/token',response_model=Token)
-async def login_for_access_token(form:Annotated[OAuth2PasswordRequestForm,Depends()],db:db_dependency):
-    user=authenticate_user(form.username,form.password,db)
-    if  not user:
-        return "Falied Authentication"
-    token=create_token(user.username,user.id,timedelta(minutes=30))
-    return {'access_token':token,'token_type':'bearer'}
->>>>>>> f98fb63f478d54339786507c6ff58c4ec04b754b
