@@ -40,7 +40,7 @@ db_dependency = Annotated[session, Depends(get_db)]
 user_dependency = Annotated[dict,Depends(decode_token)]
 
 
-# we can either use the above variable or directly the Annotated[....] in the below endpoint
+# we can either use the above db_dependency variable or directly the Annotated[....] in the below endpoint
 @router.get("/")
 async def read_db(db: db_dependency):
     return db.query(Todo).all()
@@ -64,7 +64,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency,user:user_dependen
         description=newtodo.description,
         priority=newtodo.priority,
         completed=newtodo.completed,
-        owner=user.get('id')
+        owner=user.get('id'),
     )
     """
         instead of above code we can also use below one:
