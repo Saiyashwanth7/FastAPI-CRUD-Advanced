@@ -45,10 +45,18 @@ user_dependency = Annotated[dict,Depends(decode_token)]
 async def read_db(db: db_dependency):
     return db.query(Todo).all()
 
+@router.get('/todo')
+async def read_by_auth(db:db_dependency,user:user_dependency):
+    if not user:
+        raise HTTPException(status_code=401,detail='Invalid credentials')
+    user_id=user.get("id")
+    return db.query(Todo).filter(Todo.owner==user_id).all()
 
 @router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todo).filter(Todo.id == todo_id).first()
+async def read_by_id(user:user_dependency,db: db_dependency, todo_id: int = Path(gt=0)):
+    if not user: 
+        raise HTTPException(status_code=401,detail='Authentication Error occured')
+    todo_model = db.query(Todo).filter(Todo.id == todo_id).filter(Todo.owner==user.get("id")).first()
     if todo_model:
         return todo_model
     raise HTTPException(status_code=404, detail="Todo of the id does not exists")
@@ -76,9 +84,12 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency,user:user_dependen
 
 @router.put("/todo/update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
-    db: db_dependency, update_todo: TodoRequest, todo_id: int = Path(gt=0)
+    user:user_dependency,db: db_dependency, update_todo: TodoRequest, todo_id: int = Path(gt=0)
 ):
-    todo_model = db.query(Todo).filter(Todo.id == todo_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail= "Authenication failed")
+    
+    todo_model = db.query(Todo).filter(Todo.id == todo_id).filter(Todo.owner==user.get("id")).first()
 
     if not todo_model:
         raise HTTPException(status_code=404, detail="Invalid ID")
@@ -87,16 +98,19 @@ async def update_todo(
     todo_model.description = update_todo.description
     todo_model.priority = update_todo.priority
     todo_model.completed = update_todo.completed
+    
 
     db.add(todo_model)
     db.commit()
 
 
 @router.delete("/todos/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_tod(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todo).filter(Todo.id == todo_id).first()
+async def delete_tod(user:user_dependency,db: db_dependency, todo_id: int = Path(gt=0)):
+    if not user:
+        raise HTTPException(status_code=401,detail='Invalid login credentials--login needed')
+    todo_model = db.query(Todo).filter(Todo.id == todo_id).filter(Todo.owner==user.get("id")).first()
     if not todo_model:
         raise HTTPException(status_code=404, detail="the id doesnot exists")
 
-    db.query(Todo).filter(Todo.id == todo_id).delete()
+    db.query(Todo).filter(Todo.id == todo_id).filter(Todo.owner==user.get("id")).delete()
     db.commit()
