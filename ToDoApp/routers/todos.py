@@ -3,7 +3,7 @@ from typing import Annotated
 import models
 from models import Todo
 from database import engine, sessionLocal
-from sqlalchemy.orm import session
+from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import BaseModel, Field
 from .auth import decode_token
@@ -35,7 +35,7 @@ def get_db():
 """now we need a Dependency injection which will get the return from the get_db function for which we use Depends()
 from the fastapi"""
 
-db_dependency = Annotated[session, Depends(get_db)]
+db_dependency = Annotated[Session, Depends(get_db)]
 
 user_dependency = Annotated[dict,Depends(decode_token)]
 
