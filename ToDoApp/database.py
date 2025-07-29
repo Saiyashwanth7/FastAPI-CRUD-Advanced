@@ -8,9 +8,9 @@ from sqlalchemy.orm import (
 
 from sqlalchemy.ext.declarative import declarative_base
 
-SQL_ALCHEMY_DATABASE = "sqlite:///./todosapp.db"  # This will create the todos database in this folder using sqlite
+SQL_ALCHEMY_DATABASE = "postgresql://postgres:1913101243@localhost:5432/ToDoApplicationDatabase"  # This will create the todos database in this folder using sqlite
 
-engine = create_engine(SQL_ALCHEMY_DATABASE, connect_args={"check_same_thread": False})
+engine = create_engine(SQL_ALCHEMY_DATABASE)
 
 sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
