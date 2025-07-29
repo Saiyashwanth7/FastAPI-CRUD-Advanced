@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import auth,todos,sample
+from routers import auth,todos,admin,users
 import models
 from database import engine
 
@@ -11,4 +11,5 @@ models.Base.metadata.create_all(
 
 app.include_router(auth.router)
 app.include_router(todos.router)
-#app.include_router(sample.router)
+app.include_router(admin.router)
+app.include_router(users.router)
