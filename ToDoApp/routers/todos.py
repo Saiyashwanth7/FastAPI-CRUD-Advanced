@@ -5,8 +5,9 @@ from models import Todo
 from database import engine, sessionLocal
 from sqlalchemy.orm import Session
 from starlette import status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,field_validator
 from .auth import decode_token
+from datetime import date,timezone
 
 router = APIRouter(
     prefix='/app',
@@ -18,7 +19,15 @@ class TodoRequest(BaseModel):
     description: Annotated[str, Field(min_length=15)]
     priority: Annotated[int, Field(ge=1, le=5)]
     completed: Annotated[bool, Field(default=False)]
+    duedate: Annotated[date,Field()]
 
+    @field_validator("duedate")
+    @classmethod
+    def duedate_check(cls,value):
+        if value<date.today():
+            raise ValueError("Due date in the past")
+        return value
+    
 
 def get_db():
     db = sessionLocal()
@@ -72,6 +81,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency,user:user_dependen
         description=newtodo.description,
         priority=newtodo.priority,
         completed=newtodo.completed,
+        DueDate=newtodo.duedate,
         owner=user.get('id'),
     )
     """
