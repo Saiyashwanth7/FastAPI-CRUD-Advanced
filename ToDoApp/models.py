@@ -1,7 +1,7 @@
 from database import Base
 
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey,DATETIME,TIMESTAMP,DATE
+from datetime import datetime , timezone
 
 class User(Base):
 
@@ -27,3 +27,5 @@ class Todo(Base):
     priority = Column(Integer)
     completed = Column(Boolean, default=False)
     owner = Column(Integer, ForeignKey("usertable.id"))
+    create_at=Column(TIMESTAMP,default= lambda: datetime.now(timezone.utc))
+    DueDate=Column(DATE)
