@@ -3,8 +3,8 @@ from starlette import status
 from .auth import decode_token
 from typing import Annotated
 from sqlalchemy.orm import Session
-from database import sessionLocal
-from models import Todo
+from ..database import sessionLocal
+from ..models import Todo
 
 router=APIRouter(
     prefix='/admin',

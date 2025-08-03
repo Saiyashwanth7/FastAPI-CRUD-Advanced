@@ -3,8 +3,8 @@ from starlette import status
 from .auth import decode_token
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
-from database import sessionLocal
-from models import Todo, User
+from ..database import sessionLocal
+from ..models import Todo, User
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
 

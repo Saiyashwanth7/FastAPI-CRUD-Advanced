@@ -1,8 +1,7 @@
 from fastapi import FastAPI, Depends, Path, HTTPException,APIRouter
 from typing import Annotated
-import models
-from models import Todo
-from database import engine, sessionLocal
+from ..models import Todo
+from ..database import engine, sessionLocal
 from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import BaseModel, Field,field_validator
@@ -54,7 +53,7 @@ user_dependency = Annotated[dict,Depends(decode_token)]
 async def read_db(db: db_dependency):
     return db.query(Todo).all()
 
-@router.get('/todo')
+@router.get('/todo',status_code=status.HTTP_200_OK)
 async def read_by_auth(db:db_dependency,user:user_dependency):
     if not user:
         raise HTTPException(status_code=401,detail='Invalid credentials')
