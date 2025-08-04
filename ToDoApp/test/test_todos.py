@@ -80,3 +80,22 @@ def test_read_by_db(create_todo):
             "completed": False,
         }
     ]
+
+def test_read_one_db(create_todo):
+    response = client.get("/app/todo/1")  # use prefix route of the testing endpoint
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+            "title": "Testing",
+            "priority": 1,
+            "owner": 1,
+            "description": "Need to complete learning unit and integration Testing",
+            "id": 1,
+            "completed": False,
+        }
+
+def test_read_404_db(create_todo):
+    response = client.get("/app/todo/123")  # use prefix route 0of the testing endpoint
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {"detail":"Todo of the id does not exists"}
+"""def test_create_todo(create_todo):
+    pass"""
