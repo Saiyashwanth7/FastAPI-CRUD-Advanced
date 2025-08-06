@@ -27,5 +27,5 @@ class Todo(Base):
     priority = Column(Integer)
     completed = Column(Boolean, default=False)
     owner = Column(Integer, ForeignKey("usertable.id"))
-    """create_at=Column(TIMESTAMP,default= lambda: datetime.now(timezone.utc))
-    DueDate=Column(DATE)"""
+    create_at=Column(TIMESTAMP,default= lambda: datetime.now(timezone.utc))
+    DueDate=Column(DATE)
