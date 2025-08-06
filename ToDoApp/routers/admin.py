@@ -24,17 +24,19 @@ user_dependency = Annotated[dict,Depends(decode_token)]
 
 
 # we can either use the above db_dependency variable or directly the Annotated[....] in the below endpoint
-@router.get("/todo",status_code=status.HTTP_200_OK)
+@router.get("/",status_code=status.HTTP_200_OK)
 async def read_db(db: db_dependency,user:user_dependency):
     if not user or user.get("role")!='admin':
-        raise HTTPException(status_code=401,detail='Invalid')
+        raise HTTPException(status_code=403,detail='Invalid')
     return db.query(Todo).all()
 
-@router.delete("/todo/{todo_id}",status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(user:user_dependency,db:db_dependency,todo_id:int=Path(...,ge=1)):
     if not user or user.get("role")!='admin':
         raise HTTPException(status_code=401,detail='Invalid')
     todo_model=db.query(Todo).filter(Todo.id==todo_id).first()
+    if not todo_model :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Todo not found")
     db.delete(todo_model)
     db.commit()
     
