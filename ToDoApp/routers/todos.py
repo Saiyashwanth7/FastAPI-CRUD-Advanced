@@ -60,7 +60,7 @@ async def read_by_auth(db: db_dependency, user: user_dependency):
     return db.query(Todo).filter(Todo.owner == user_id).all()
 
 
-@router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
+@router.get("/{todo_id}", status_code=status.HTTP_200_OK)
 async def read_by_id(
     user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
 ):
@@ -77,7 +77,7 @@ async def read_by_id(
     raise HTTPException(status_code=404, detail="Todo of the id does not exists")
 
 
-@router.post("/todo/create/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_dependency):
     if user is None:
         raise HTTPException(
@@ -100,7 +100,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_depend
     db.commit()
 
 
-@router.put("/todo/update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
     user: user_dependency,
     db: db_dependency,
@@ -131,7 +131,7 @@ async def update_todo(
     db.commit()
 
 
-@router.delete("/todos/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tod(
     user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
 ):

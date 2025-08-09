@@ -40,12 +40,13 @@ class PasswordRequest(BaseModel):
     current_password:str
     new_password:Annotated[str,Field(min_length=8)]
 
-@router.get("/get-user", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK)
 async def get_user(user: user_dependency, db: db_dependency):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid User"
         )
+    #return db.query(User).filter(User.id == user.get("id")).first()
     user_username = user.get("sub")
     user_id = user.get("id")
     if not user_id or not user_username:
@@ -71,7 +72,7 @@ async def get_user(user: user_dependency, db: db_dependency):
         "hashed_password":user_model.hashed_password,
     }
 
-@router.put('/update-password/')
+@router.put('/',status_code=status.HTTP_204_NO_CONTENT)
 async def update_password(user:user_dependency,db:db_dependency,passwordrequest:PasswordRequest):
     if not user:
         raise HTTPException(
