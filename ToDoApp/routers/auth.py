@@ -60,6 +60,7 @@ db_dependency = Annotated[session, Depends(get_db)]
 from OAuth2PasswordRequestForm to required enpoint"""
 oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth/token") #here auth/token is the endpoint url of login_for_access_token function
 
+form_dependency=Annotated[OAuth2PasswordRequestForm, Depends()]
 
 def authenticate_user(username: str, password: str, db):
     user = db.query(User).filter(User.username == username).first()
@@ -84,11 +85,11 @@ async def decode_token(token: Annotated[str, Depends(oauth_bearer)]):
         user_id: int = payload.get("id")
         user_role:str =payload.get("role")
         if not username or not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Unauthorized user")
         return {"sub": username, "id": user_id , "role":user_role}
 
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Unauthorized user")
 
 #Endpoint for User Creation
 @router.post("/", response_model=UserRequest,status_code=status.HTTP_201_CREATED)
@@ -117,7 +118,7 @@ async def create_user(db: db_dependency, userrequest: UserRequest):
 #Token creation based on credential
 @router.post("/token", response_model=Token,status_code=status.HTTP_200_OK)
 async def login_for_access_token(
-    form: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+    form: form_dependency, db: db_dependency
 ):
     user = authenticate_user(form.username, form.password, db)
     if not user:
