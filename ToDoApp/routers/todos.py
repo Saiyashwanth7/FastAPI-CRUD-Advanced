@@ -11,14 +11,14 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
 
-router = APIRouter(prefix="/app", tags=["todos"])
+router = APIRouter(prefix="/todos", tags=["todos"])
 
 
 class TodoRequest(BaseModel):
     title: Annotated[str, Field(min_length=7)]
     description: Annotated[str, Field(min_length=15)]
     priority: Annotated[int, Field(ge=1, le=5)]
-    completed: Annotated[bool, Field(default=False)]
+    complete: Annotated[bool, Field(default=False)]
     duedate: Annotated[date, Field()]
 
     @field_validator("duedate")
@@ -56,7 +56,7 @@ def redirect_to_login():
     return redirectresponse
 
 ### Pages
-@router.get("/todopage")
+@router.get("/todo-page")
 async def render_todo_request(request:Request,db:db_dependency):
     try:
         user= await decode_token(request.cookies.get("access_token"))
@@ -110,7 +110,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_depend
         title=newtodo.title,
         description=newtodo.description,
         priority=newtodo.priority,
-        completed=newtodo.completed,
+        completed=newtodo.complete,
         DueDate=newtodo.duedate,
         owner=user.get("id"),
     )
@@ -147,7 +147,7 @@ async def update_todo(
     todo_model.title = update_todo.title
     todo_model.description = update_todo.description
     todo_model.priority = update_todo.priority
-    todo_model.completed = update_todo.completed
+    todo_model.completed = update_todo.complete
     todo_model.DueDate = update_todo.duedate
     db.add(todo_model)
     db.commit()
