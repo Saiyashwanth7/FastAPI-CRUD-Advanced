@@ -1,0 +1,71 @@
+{% include 'layout.html' %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Register
+        </div>
+        <div class="card-body">
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="email">Email *</label>
+                        <input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+                        <div class="error-message" id="email-error"></div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="username">Username *</label>
+                        <input type="text" class="form-control" id="username" name="username" autocomplete="username" required>
+                        <div class="error-message" id="username-error"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="firstname">First Name *</label>
+                        <input type="text" class="form-control" id="firstname" name="firstname" autocomplete="given-name" required>
+                        <div class="error-message" id="firstname-error"></div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="lastname">Last Name *</label>
+                        <input type="text" class="form-control" id="lastname" name="lastname" autocomplete="family-name" required>
+                        <div class="error-message" id="lastname-error"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="role">Role *</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                        <div class="error-message" id="role-error"></div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="phone_number">Phone Number *</label>
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number" autocomplete="tel" required>
+                        <div class="error-message" id="phone_number-error"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required minlength="8">
+                    <div class="error-message" id="password-error"></div>
+                    <small class="form-text text-muted">Password must be at least 8 characters long</small>
+                </div>
+                <div class="form-group">
+                    <label for="password2">Verify Password *</label>
+                    <input type="password" class="form-control" id="password2" name="password2" autocomplete="new-password" required>
+                    <div class="error-message" id="password2-error"></div>
+                    <div class="success-message" id="password-match-success">Passwords match!</div>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">
+                    Register
+                </button>
+            </form>
+        </div>
+        <div class="card-footer">
+            <a href="/auth/login-page" class="text-decoration-none">Already have an account? Go to Login</a>
+        </div>
+    </div>
+</div>

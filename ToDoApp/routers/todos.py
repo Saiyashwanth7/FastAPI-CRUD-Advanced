@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Path, HTTPException, APIRouter
+from fastapi import FastAPI, Depends, Path, HTTPException, APIRouter,Request
 from typing import Annotated
 from ..models import Todo
 from ..database import engine, sessionLocal
@@ -7,6 +7,9 @@ from starlette import status
 from pydantic import BaseModel, Field, field_validator
 from .auth import decode_token
 from datetime import date, timezone
+from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse
+
 
 router = APIRouter(prefix="/app", tags=["todos"])
 
@@ -45,7 +48,26 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 user_dependency = Annotated[dict, Depends(decode_token)]
 
+template=Jinja2Templates(directory="ToDoApp/template")
 
+def redirect_to_login():
+    redirectresponse=RedirectResponse(url="/auth/login-page",status_code=status.HTTP_302_FOUND)
+    redirectresponse.delete_cookie(key="access_token")
+    return redirectresponse
+
+### Pages
+@router.get("/todopage")
+async def render_todo_request(request:Request,db:db_dependency):
+    try:
+        user= await decode_token(request.cookies.get("access_token"))
+        if not user:
+            return redirect_to_login()
+        todo=db.query(Todo).filter(Todo.owner == user.get("id")).all()
+        return template.TemplateResponse("todo.html",{"request":request,"todos":todo,"user":user})
+    except:
+        return redirect_to_login()
+
+###Endpoints
 # we can either use the above db_dependency variable or directly the Annotated[....] in the below endpoint
 @router.get("/")
 async def read_db(db: db_dependency):

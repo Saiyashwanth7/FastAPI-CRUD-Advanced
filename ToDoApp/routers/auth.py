@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Request
 from starlette import status
 from pydantic import BaseModel, EmailStr, Field
 from typing import Annotated, Optional
@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import timedelta, datetime, timezone
 from jose import jwt, JWTError
+from fastapi.templating import Jinja2Templates
 
 #Pydantic models
 
@@ -62,6 +63,18 @@ oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth/token") #here auth/token is t
 
 form_dependency=Annotated[OAuth2PasswordRequestForm, Depends()]
 
+templates = Jinja2Templates(directory="ToDoApp/template")
+
+###Pages
+@router.get("/login-page")
+def login_request(request:Request):
+    return templates.TemplateResponse("login.html",{"request":request})
+
+@router.get("/register-page")
+def register_request(request:Request):
+    return templates.TemplateResponse("register.html",{"request":request})
+
+###Endpoints
 def authenticate_user(username: str, password: str, db):
     user = db.query(User).filter(User.username == username).first()
     if not user:
