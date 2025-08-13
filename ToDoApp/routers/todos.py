@@ -19,14 +19,14 @@ class TodoRequest(BaseModel):
     description: Annotated[str, Field(min_length=15)]
     priority: Annotated[int, Field(ge=1, le=5)]
     complete: Annotated[bool, Field(default=False)]
-    duedate: Annotated[date, Field()]
+    """duedate: Annotated[date, Field()]
 
     @field_validator("duedate")
     @classmethod
     def duedate_check(cls, value):
         if value < date.today():
             raise ValueError("Due date in the past")
-        return value
+        return value"""
 
 
 def get_db():
@@ -67,6 +67,16 @@ async def render_todo_request(request:Request,db:db_dependency):
     except:
         return redirect_to_login()
 
+@router.get("/add-todo-page")
+async def render_add_todo(request:Request,db:db_dependency):
+    try:
+        user= await decode_token(request.cookies.get("access_token"))
+        if not user:
+            return redirect_to_login()
+        return template.TemplateResponse("add_todo.html",{"request":request,"user":user})
+    except:
+        return redirect_to_login()
+
 ###Endpoints
 # we can either use the above db_dependency variable or directly the Annotated[....] in the below endpoint
 @router.get("/")
@@ -99,7 +109,7 @@ async def read_by_id(
     raise HTTPException(status_code=404, detail="Todo of the id does not exists")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/todo", status_code=status.HTTP_201_CREATED)
 async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_dependency):
     if user is None:
         raise HTTPException(
@@ -111,7 +121,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_depend
         description=newtodo.description,
         priority=newtodo.priority,
         completed=newtodo.complete,
-        DueDate=newtodo.duedate,
+        #DueDate=newtodo.duedate,
         owner=user.get("id"),
     )
     """
@@ -148,7 +158,7 @@ async def update_todo(
     todo_model.description = update_todo.description
     todo_model.priority = update_todo.priority
     todo_model.completed = update_todo.complete
-    todo_model.DueDate = update_todo.duedate
+    #todo_model.DueDate = update_todo.duedate
     db.add(todo_model)
     db.commit()
 
