@@ -3,13 +3,27 @@ from starlette import status
 from pydantic import BaseModel, EmailStr, Field
 from typing import Annotated, Optional
 from ..database import sessionLocal, engine
-from sqlalchemy.orm import session
+from sqlalchemy.orm import Session
 from ..models import User
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import timedelta, datetime, timezone
 from jose import jwt, JWTError
 from fastapi.templating import Jinja2Templates
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Now retrieve values
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+
+if not SECRET_KEY or not ALGORITHM:
+    raise ValueError("Missing required environment variables")
 
 #Pydantic models
 
@@ -34,12 +48,6 @@ router = APIRouter(
     tags=['auth']
 )
 
-#Hashing secret key and algorithm
-SECRET_KEY = "d5bbc198a5de8cb2e71245d6ee97a9d993f199689a5c0922a1803170274f5be0"
-ALGORITHM = "HS256"
-
-
-
 def get_db():
     db = sessionLocal()
     try:
@@ -54,7 +62,7 @@ def get_db():
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 #This below dependency injection is used for initializing the Database by using get_db function
-db_dependency = Annotated[session, Depends(get_db)]
+db_dependency = Annotated[Session, Depends(get_db)]
 
 
 """This below dependency injection would help in sending the "Form data" 
@@ -124,7 +132,6 @@ async def create_user(db: db_dependency, userrequest: UserRequest):
         username=new_user.username,
         first_name=new_user.first_name,
         last_name=new_user.last_name,
-        password=userrequest.password,
         role=new_user.role,
     )
 
@@ -139,6 +146,6 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Failed Authentication"
         )
-    token = create_token(user.username, user.id, user.role, timedelta(minutes=30))
+    token = create_token(user.username, user.id, user.role, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return Token(access_token=token, token_type="bearer")
 
