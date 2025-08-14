@@ -76,7 +76,19 @@ async def render_add_todo(request:Request,db:db_dependency):
         return template.TemplateResponse("add_todo.html",{"request":request,"user":user})
     except:
         return redirect_to_login()
-
+    
+@router.get("/edit-todo-page/{todo_id}")
+async def render_edit_todo(request:Request,todo_id:int,db:db_dependency):
+    try:
+        user= await decode_token(request.cookies.get("access_token"))
+        if not user:
+            return redirect_to_login()
+        todo=db.query(Todo).filter(Todo.id == todo_id).first()
+        return template.TemplateResponse("edit_todo.html",{"request":request,"user":user,"todo":todo})
+    except:
+        return redirect_to_login()
+        
+        
 ###Endpoints
 # we can either use the above db_dependency variable or directly the Annotated[....] in the below endpoint
 @router.get("/")
@@ -132,7 +144,7 @@ async def create_todo(newtodo: TodoRequest, db: db_dependency, user: user_depend
     db.commit()
 
 
-@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
     user: user_dependency,
     db: db_dependency,
@@ -163,7 +175,7 @@ async def update_todo(
     db.commit()
 
 
-@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tod(
     user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
 ):
